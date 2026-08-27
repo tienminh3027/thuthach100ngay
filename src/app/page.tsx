@@ -5,122 +5,187 @@ import { QUESTIONS } from "@/data/questions";
 
 export default function Home() {
   const [currentDay, setCurrentDay] = useState<number>(1);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [userAnswers, setUserAnswers] = useState<(boolean | null)[]>([
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
-  const [streak, setStreak] = useState<number>(1);
 
   const question = QUESTIONS.find((q) => q.day === currentDay) || QUESTIONS[0];
 
-  const handleSubmit = () => {
-    if (selectedOption === null) return;
-    setIsSubmitted(true);
-    if (selectedOption === question.correctAnswer) {
-      setStreak((prev) => prev + 1);
-    }
+  const handleSelect = (index: number, value: boolean) => {
+    if (isSubmitted) return;
+    const newAnswers = [...userAnswers];
+    newAnswers[index] = value;
+    setUserAnswers(newAnswers);
+  };
+
+  const isAllAnswered = userAnswers.every((val) => val !== null);
+
+  const calculateScore = () => {
+    let count = 0;
+    userAnswers.forEach((ans, idx) => {
+      if (ans === question.answers[idx]) count++;
+    });
+    return count;
   };
 
   const handleNextDay = () => {
     setIsSubmitted(false);
-    setSelectedOption(null);
+    setUserAnswers([null, null, null, null]);
     if (currentDay < QUESTIONS.length) {
       setCurrentDay((prev) => prev + 1);
     }
   };
 
+  const labels = ["a", "b", "c", "d"];
+
   return (
     <main className="min-h-screen bg-slate-900 text-slate-100 p-4 md:p-8 font-sans">
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <header className="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700">
           <div>
             <h1 className="text-xl font-bold text-emerald-400">🔥 100 Days Trace Code THPTQG 2027</h1>
             <p className="text-sm text-slate-400">Ngày {question.day} / 100</p>
           </div>
-          <div className="bg-slate-700 px-4 py-2 rounded-lg font-bold text-amber-400 flex items-center gap-1">
-            <span>⚡ Streak:</span> {streak} ngày
-          </div>
         </header>
 
-        {/* Card Đề Bài */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-slate-200">
-            Câu {question.day}: {question.title}
-          </h2>
-          <p className="text-sm text-slate-300">Cho đoạn mã Python sau, hãy xác định kết quả in ra màn hình:</p>
+        {/* Khung Khối Đề Bài */}
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-6">
+          <p className="text-base text-slate-200 leading-relaxed font-medium">
+            <span className="text-amber-400 font-bold mr-2">Câu {question.day}:</span>
+            {question.title}
+          </p>
 
-          {/* Block Code */}
-          <pre className="bg-slate-950 p-4 rounded-lg font-mono text-emerald-300 text-sm overflow-x-auto border border-slate-800">
-            <code>{question.code}</code>
-          </pre>
+          {/* BẢNG CODE 2 CỘT (Nếu là câu code) */}
+          {question.type === "code" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border border-slate-700 rounded-lg overflow-hidden bg-slate-950">
+              {/* Python */}
+              <div className="border-b md:border-b-0 md:border-r border-slate-700 p-4 space-y-2">
+                <div className="text-emerald-400 font-bold text-sm border-b border-slate-800 pb-2">
+                  🐍 Python
+                </div>
+                <pre className="font-mono text-emerald-300 text-xs md:text-sm overflow-x-auto leading-relaxed">
+                  <code>{question.pythonCode}</code>
+                </pre>
+              </div>
 
-          {/* Đáp án */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-            {question.options.map((option, idx) => {
-              let btnStyle = "bg-slate-700 hover:bg-slate-600 border-slate-600";
-              if (selectedOption === idx) btnStyle = "bg-blue-600 border-blue-400";
-              if (isSubmitted) {
-                if (idx === question.correctAnswer) btnStyle = "bg-emerald-600 border-emerald-400";
-                else if (selectedOption === idx) btnStyle = "bg-rose-600 border-rose-400";
-              }
-
-              return (
-                <button
-                  key={idx}
-                  disabled={isSubmitted}
-                  onClick={() => setSelectedOption(idx)}
-                  className={`p-3 text-left rounded-lg border font-mono transition-all ${btnStyle}`}
-                >
-                  <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span> {option}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Nút kiểm tra */}
-          {!isSubmitted ? (
-            <button
-              onClick={handleSubmit}
-              disabled={selectedOption === null}
-              className="w-full py-3 mt-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-bold rounded-lg transition-colors"
-            >
-              Nộp bài & Kiểm tra
-            </button>
-          ) : (
-            <button
-              onClick={handleNextDay}
-              className="w-full py-3 mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors"
-            >
-              Chuyển sang ngày tiếp theo →
-            </button>
+              {/* C++ */}
+              <div className="p-4 space-y-2">
+                <div className="text-cyan-400 font-bold text-sm border-b border-slate-800 pb-2">
+                  ⚡ C++
+                </div>
+                <pre className="font-mono text-cyan-300 text-xs md:text-sm overflow-x-auto leading-relaxed">
+                  <code>{question.cppCode}</code>
+                </pre>
+              </div>
+            </div>
           )}
-        </div>
 
-        {/* Giải thích / Bảng vết code */}
-        {isSubmitted && (
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-4">
-            <h3 className="text-md font-bold text-amber-400">📊 Bảng chạy vết (Tracing Table) chi tiết:</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-700 text-slate-400">
-                    <th className="py-2 px-3">Bước execution</th>
-                    <th className="py-2 px-3">Biến/Trạng thái 1</th>
-                    <th className="py-2 px-3">Biến/Trạng thái 2</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {question.explanation.map((row, index) => (
-                    <tr key={index} className="border-b border-slate-700/50">
-                      <td className="py-2 px-3 text-slate-300">{row.step}</td>
-                      <td className="py-2 px-3 font-mono text-emerald-400">{row.s}</td>
-                      <td className="py-2 px-3 font-mono text-amber-300">{row.i}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* BẢNG Ý A, B, C, D VỚI Ô TICK ĐÚNG / SAI */}
+          <div className="space-y-3 pt-2">
+            <p className="text-sm font-semibold text-slate-400">
+              Mỗi phát biểu sau đây là Đúng hay Sai?
+            </p>
+
+            <div className="border border-slate-700 rounded-lg overflow-hidden divide-y divide-slate-700/60 bg-slate-900/50">
+              {question.statements.map((text, idx) => {
+                const userAns = userAnswers[idx];
+
+                return (
+                  <div key={idx} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    {/* Nội dung ý */}
+                    <div className="text-sm text-slate-200 flex-1">
+                      <span className="font-bold text-amber-400 mr-2">{labels[idx]})</span>
+                      {text}
+                    </div>
+
+                    {/* 2 Ô TICK CHỌN ĐÚNG / SAI */}
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        disabled={isSubmitted}
+                        onClick={() => handleSelect(idx, true)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all border ${
+                          userAns === true
+                            ? "bg-emerald-600 border-emerald-400 text-white"
+                            : "bg-slate-800 border-slate-600 text-slate-400 hover:border-slate-500"
+                        }`}
+                      >
+                        <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center text-[10px] ${
+                          userAns === true ? "border-white bg-white text-emerald-600" : "border-slate-500"
+                        }`}>
+                          {userAns === true && "✓"}
+                        </span>
+                        ĐÚNG
+                      </button>
+
+                      <button
+                        disabled={isSubmitted}
+                        onClick={() => handleSelect(idx, false)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all border ${
+                          userAns === false
+                            ? "bg-rose-600 border-rose-400 text-white"
+                            : "bg-slate-800 border-slate-600 text-slate-400 hover:border-slate-500"
+                        }`}
+                      >
+                        <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center text-[10px] ${
+                          userAns === false ? "border-white bg-white text-rose-600" : "border-slate-500"
+                        }`}>
+                          {userAns === false && "✓"}
+                        </span>
+                        SAI
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        )}
+
+          {/* NÚT CHẤM ĐIỂM / NỘP BÀI */}
+          {!isSubmitted && (
+            <button
+              onClick={() => setIsSubmitted(true)}
+              disabled={!isAllAnswered}
+              className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-slate-950 font-bold rounded-lg transition-colors text-sm"
+            >
+              Nộp bài & Chấm điểm ({userAnswers.filter((v) => v !== null).length}/4)
+            </button>
+          )}
+
+          {/* KẾT QUẢ KÈM ĐÁP ÁN CHI TIẾT Ở DƯỚI KHI NỘP BÀI */}
+          {isSubmitted && (
+            <div className="space-y-6 pt-2 border-t border-slate-700">
+              {/* Hiển thị kết quả điểm */}
+              <div className="p-4 bg-slate-950 rounded-lg border border-slate-700 text-center">
+                <p className="text-base font-semibold text-slate-200">
+                  Kết quả làm bài: <span className="text-amber-400 font-bold text-xl">{calculateScore()}/4</span> ý chính xác
+                </p>
+              </div>
+
+              {/* Khối Đáp án chi tiết */}
+              <div className="bg-slate-950 p-5 rounded-lg border border-slate-700 space-y-2">
+                <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-wider">
+                  📖 Lời giải & Đáp án chi tiết:
+                </h3>
+                <div className="font-mono text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
+                  {question.explanation}
+                </div>
+              </div>
+
+              {/* Nút sang bài tiếp theo */}
+              <button
+                onClick={handleNextDay}
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-sm"
+              >
+                Chuyển sang Ngày tiếp theo →
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
