@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>100 Days Trace Code THPTQG 2027</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const QUESTIONS = [
+      {
+        day: 1,
+        type: "code",
+        title: "Lựa chọn ngôn ngữ lập trình Python hoặc C++ để tìm hiểu đoạn chương trình sau:",
+        pythonCode: `def sort_algo(A, n):\n    for i in range(n - 1):\n        for j in range(n - 1 - i):\n            if A[j] > A[j + 1]:\n                A[j], A[j + 1] = A[j + 1], A[j]`,
+        cppCode: `void sort_algo(int A[], int n) {\n    for (int i = 0; i < n - 1; i++) {\n        for (int j = 0; j < n - 1 - i; j++) {\n            if (A[j] > A[j + 1]) {\n                int temp = A[j];\n                A[j] = A[j + 1];\n                A[j + 1] = temp;\n            }\n        }\n    }\n}`,
+        statements: [
+          "Hàm sort_algo thể hiện thuật toán Sắp xếp chèn (Insertion Sort).",
+          "Thao tác cơ bản nhất của thuật toán này là so sánh và đổi chỗ hai phần tử kề nhau nếu chúng bị ngược thứ tự.",
+          "Độ phức tạp thời gian của đoạn mã trên luôn là O(n^2) trong mọi trường hợp do có hai vòng lặp lồng nhau.",
+          "Nếu truyền mảng A = [5, 2, 8, 1] và n = 4, sau khi kết thúc vòng lặp ngoài lần ĐẦU TIÊN (i = 0), phần tử 8 được đẩy về cuối mảng."
+        ],
+        answers: [false, true, true, true],
+        explanation: `ĐÁP ÁN CHI TIẾT CÂU 1:\na) Sai. Đây là thuật toán Sắp xếp nổi bọt (Bubble Sort).\nb) Đúng. Thuật toán so sánh từng cặp kề nhau A[j] và A[j+1] để đổi chỗ.\nc) Đúng. 2 vòng lặp lồng nhau chạy cố định n*(n-1)/2 lần.\nd) Đúng. Sau lượt i = 0, mảng trở thành [2, 5, 1, 8], số 8 được đẩy về cuối.`
+      },
+      {
+        day: 2,
+        type: "theory",
+        title: "Để xây dựng phần mềm quản lý thư viện, nhóm học sinh chia nhỏ chương trình thành 3 hàm: NhapThongTinSach(), TimKiemSach(), và InDanhSach().",
+        statements: [
+          "Việc chia chương trình thành 3 hàm là ví dụ minh hoạ cho phương pháp thiết kế chương trình theo mô đun.",
+          "Hàm TimKiemSach() có thể được lập trình và kiểm thử độc lập mà không cần chờ hàm InDanhSach() viết xong.",
+          "Khi kiểm thử, nhóm chỉ cần nhập đúng một bộ dữ liệu là 1 quyển sách chuẩn là đủ để đánh giá chương trình không lỗi.",
+          "Tổ chức chương trình thành các mô đun giúp dễ dàng phân công công việc và bảo trì mã nguồn sau này."
+        ],
+        answers: [true, true, false, true],
+        explanation: `ĐÁP ÁN CHI TIẾT CÂU 2:\na) Đúng. Chia nhỏ chương trình thành các hàm độc lập là bản chất của thiết kế mô đun.\nb) Đúng. Các mô đun độc lập cho phép lập trình và test riêng lẻ.\nc) Sai. Cần test nhiều bộ dữ liệu: biên, dữ liệu rỗng, dữ liệu sai...\nd) Đúng. Đây là ưu điểm chính giúp phân công công việc.`
+      }
+    ];
+
+    function App() {
+      const [currentDay, setCurrentDay] = useState(1);
+      const [userAnswers, setUserAnswers] = useState([null, null, null, null]);
+      const [isSubmitted, setIsSubmitted] = useState(false);
+
+      const question = QUESTIONS.find((q) => q.day === currentDay) || QUESTIONS[0];
+
+      const handleSelect = (idx, value) => {
+        if (isSubmitted) return;
+        const newAns = [...userAnswers];
+        newAns[idx] = value;
+        setUserAnswers(newAns);
+      };
+
+      const isAllAnswered = userAnswers.every((v) => v !== null);
+
+      const calculateScore = () => {
+        return userAnswers.reduce((score, ans, idx) => score + (ans === question.answers[idx] ? 1 : 0), 0);
+      };
+
+      const handleNextDay = () => {
+        setIsSubmitted(false);
+        setUserAnswers([null, null, null, null]);
+        if (currentDay < QUESTIONS.length) setCurrentDay(currentDay + 1);
+      };
+
+      const labels = ["a", "b", "c", "d"];
+
+      return (
+        <main className="p-4 md:p-8">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <header className="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700">
+              <h1 className="text-xl font-bold text-emerald-400">🔥 100 Days Trace Code THPTQG 2027</h1>
+              <span className="text-sm text-slate-400">Ngày {question.day} / 100</span>
+            </header>
+
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-6">
+              <p className="text-base text-slate-200 font-medium">
+                <span className="text-amber-400 font-bold mr-2">Câu {question.day}:</span>
+                {question.title}
+              </p>
+
+              {question.type === "code" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border border-slate-700 rounded-lg overflow-hidden bg-slate-950">
+                  <div className="border-b md:border-b-0 md:border-r border-slate-700 p-4">
+                    <div className="text-emerald-400 font-bold text-sm mb-2">🐍 Python</div>
+                    <pre className="font-mono text-emerald-300 text-xs md:text-sm overflow-x-auto"><code>{question.pythonCode}</code></pre>
+                  </div>
+                  <div className="p-4">
+                    <div className="text-cyan-400 font-bold text-sm mb-2">⚡ C++</div>
+                    <pre className="font-mono text-cyan-300 text-xs md:text-sm overflow-x-auto"><code>{question.cppCode}</code></pre>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-slate-400">Mỗi phát biểu sau đây là Đúng hay Sai?</p>
+                <div className="border border-slate-700 rounded-lg divide-y divide-slate-700 bg-slate-900/50">
+                  {question.statements.map((text, idx) => (
+                    <div key={idx} className="p-4 flex flex-col sm:flex-row justify-between gap-4">
+                      <div className="text-sm text-slate-200 flex-1">
+                        <span className="font-bold text-amber-400 mr-2">{labels[idx]})</span>{text}
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <button
+                          onClick={() => handleSelect(idx, true)}
+                          className={`px-3 py-1.5 rounded text-xs font-bold border ${userAnswers[idx] === true ? "bg-emerald-600 border-emerald-400 text-white" : "bg-slate-800 border-slate-600 text-slate-400"}`}
+                        >
+                          ĐÚNG
+                        </button>
+                        <button
+                          onClick={() => handleSelect(idx, false)}
+                          className={`px-3 py-1.5 rounded text-xs font-bold border ${userAnswers[idx] === false ? "bg-rose-600 border-rose-400 text-white" : "bg-slate-800 border-slate-600 text-slate-400"}`}
+                        >
+                          SAI
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {!isSubmitted ? (
+                <button
+                  onClick={() => setIsSubmitted(true)}
+                  disabled={!isAllAnswered}
+                  className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-slate-950 font-bold rounded-lg"
+                >
+                  Nộp bài & Chấm điểm
+                </button>
+              ) : (
+                <div className="space-y-4 pt-2 border-t border-slate-700">
+                  <div className="p-4 bg-slate-950 rounded-lg text-center font-bold">
+                    Kết quả: <span className="text-amber-400">{calculateScore()}/4</span> ý chính xác
+                  </div>
+                  <div className="bg-slate-950 p-4 rounded-lg font-mono text-sm text-slate-300 whitespace-pre-wrap">
+                    {question.explanation}
+                  </div>
+                  <button onClick={handleNextDay} className="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-lg">
+                    Chuyển sang Ngày tiếp theo →
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </main>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
