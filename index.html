@@ -16,8 +16,8 @@
     const { useState } = React;
 
     const QUESTIONS = [
-       {
-        day: 1, // Thay đổi số ngày tùy ý
+      {
+        day: 1,
         type: "code",
         title: "Lựa chọn ngôn ngữ lập trình Python hoặc C++ để tìm hiểu đoạn chương trình sau:",
         pythonCode: `def sort_algo(A, n):\n    for i in range(n - 1):\n        for j in range(n - 1 - i):\n            if A[j] > A[j + 1]:\n                A[j], A[j + 1] = A[j + 1], A[j]`,
@@ -71,7 +71,7 @@ a) Sai (Bubble Sort – Sắp xếp nổi bọt).
 b) Đúng.
 c) Đúng.
 d) Đúng.`
-      }, 
+      }
     ];
 
     function App() {
@@ -94,7 +94,7 @@ d) Đúng.`
         return userAnswers.reduce((score, ans, idx) => score + (ans === question.answers[idx] ? 1 : 0), 0);
       };
 
-const handleNextDay = () => {
+      const handleNextDay = () => {
         const nextDay = currentDay + 1;
         const hasNextQuestion = QUESTIONS.some((q) => q.day === nextDay);
 
@@ -105,6 +105,32 @@ const handleNextDay = () => {
         } else {
           alert(`⚠️ Chưa có dữ liệu cho Ngày ${nextDay}! Bạn đã hoàn thành hết các bài hiện có.`);
         }
+      };
+
+      const getButtonStyle = (idx, btnValue) => {
+        const userAns = userAnswers[idx];
+        const correctAns = question.answers[idx];
+
+        // 1. Khi CHƯA nộp bài: Chọn thì đổi màu trung tính xám đậm, KHÔNG xanh/đỏ
+        if (!isSubmitted) {
+          if (userAns === btnValue) {
+            return "bg-slate-600 border-slate-300 text-white font-bold shadow-md scale-105";
+          }
+          return "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700/80";
+        }
+
+        // 2. Khi ĐÃ nộp bài: Tô màu đáp án Đúng/Sai
+        if (correctAns === btnValue) {
+          // Đáp án đúng luôn tô XANH
+          return "bg-emerald-600 border-emerald-400 text-white font-bold ring-2 ring-emerald-400/50";
+        }
+        if (userAns === btnValue && userAns !== correctAns) {
+          // Đáp án người dùng chọn bị SAI -> tô ĐỎ
+          return "bg-rose-600 border-rose-400 text-white font-bold ring-2 ring-rose-400/50";
+        }
+
+        // Các nút không liên quan bị làm mờ
+        return "bg-slate-800/40 border-slate-700/50 text-slate-600 opacity-40";
       };
 
       const labels = ["a", "b", "c", "d"];
@@ -139,27 +165,50 @@ const handleNextDay = () => {
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-slate-400">Mỗi phát biểu sau đây là Đúng hay Sai?</p>
                 <div className="border border-slate-700 rounded-lg divide-y divide-slate-700 bg-slate-900/50">
-                  {question.statements.map((text, idx) => (
-                    <div key={idx} className="p-4 flex flex-col sm:flex-row justify-between gap-4">
-                      <div className="text-sm text-slate-200 flex-1">
-                        <span className="font-bold text-amber-400 mr-2">{labels[idx]})</span>{text}
+                  {question.statements.map((text, idx) => {
+                    const isCorrect = userAnswers[idx] === question.answers[idx];
+
+                    return (
+                      <div key={idx} className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="text-sm text-slate-200 flex-1 flex items-start gap-2">
+                          <span className="font-bold text-amber-400 shrink-0">{labels[idx]})</span>
+                          <span className="flex-1">{text}</span>
+                          
+                          {/* Dấu Tích (✓) hoặc Dấu X (✗) hiển thị sau khi nộp bài */}
+                          {isSubmitted && (
+                            <span className="font-bold text-base shrink-0 ml-1">
+                              {isCorrect ? (
+                                <span className="text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full inline-flex items-center gap-1 text-xs">
+                                  ✓ Đúng
+                                </span>
+                              ) : (
+                                <span className="text-rose-400 bg-rose-950/80 border border-rose-500/30 px-2 py-0.5 rounded-full inline-flex items-center gap-1 text-xs">
+                                  ✗ Sai
+                                </span>
+                              )}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2 shrink-0 self-end sm:self-auto">
+                          <button
+                            onClick={() => handleSelect(idx, true)}
+                            disabled={isSubmitted}
+                            className={`px-3.5 py-1.5 rounded text-xs transition-all duration-150 ${getButtonStyle(idx, true)}`}
+                          >
+                            ĐÚNG
+                          </button>
+                          <button
+                            onClick={() => handleSelect(idx, false)}
+                            disabled={isSubmitted}
+                            className={`px-3.5 py-1.5 rounded text-xs transition-all duration-150 ${getButtonStyle(idx, false)}`}
+                          >
+                            SAI
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex gap-2 shrink-0">
-                        <button
-                          onClick={() => handleSelect(idx, true)}
-                          className={`px-3 py-1.5 rounded text-xs font-bold border ${userAnswers[idx] === true ? "bg-emerald-600 border-emerald-400 text-white" : "bg-slate-800 border-slate-600 text-slate-400"}`}
-                        >
-                          ĐÚNG
-                        </button>
-                        <button
-                          onClick={() => handleSelect(idx, false)}
-                          className={`px-3 py-1.5 rounded text-xs font-bold border ${userAnswers[idx] === false ? "bg-rose-600 border-rose-400 text-white" : "bg-slate-800 border-slate-600 text-slate-400"}`}
-                        >
-                          SAI
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -167,7 +216,7 @@ const handleNextDay = () => {
                 <button
                   onClick={() => setIsSubmitted(true)}
                   disabled={!isAllAnswered}
-                  className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-slate-950 font-bold rounded-lg"
+                  className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-slate-950 font-bold rounded-lg transition-colors"
                 >
                   Nộp bài & Chấm điểm
                 </button>
@@ -176,10 +225,10 @@ const handleNextDay = () => {
                   <div className="p-4 bg-slate-950 rounded-lg text-center font-bold">
                     Kết quả: <span className="text-amber-400">{calculateScore()}/4</span> ý chính xác
                   </div>
-                  <div className="bg-slate-950 p-4 rounded-lg font-mono text-sm text-slate-300 whitespace-pre-wrap">
+                  <div className="bg-slate-950 p-4 rounded-lg font-mono text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
                     {question.explanation}
                   </div>
-                  <button onClick={handleNextDay} className="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-lg">
+                  <button onClick={handleNextDay} className="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-lg transition-colors">
                     Chuyển sang Ngày tiếp theo →
                   </button>
                 </div>
