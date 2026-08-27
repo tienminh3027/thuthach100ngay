@@ -16,8 +16,8 @@
     const { useState } = React;
 
     const QUESTIONS = [
-      {
-        day: 1,
+       {
+        day: 3, // Thay đổi số ngày tùy ý
         type: "code",
         title: "Lựa chọn ngôn ngữ lập trình Python hoặc C++ để tìm hiểu đoạn chương trình sau:",
         pythonCode: `def sort_algo(A, n):\n    for i in range(n - 1):\n        for j in range(n - 1 - i):\n            if A[j] > A[j + 1]:\n                A[j], A[j + 1] = A[j + 1], A[j]`,
@@ -25,25 +25,53 @@
         statements: [
           "Hàm sort_algo thể hiện thuật toán Sắp xếp chèn (Insertion Sort).",
           "Thao tác cơ bản nhất của thuật toán này là so sánh và đổi chỗ hai phần tử kề nhau nếu chúng bị ngược thứ tự.",
-          "Độ phức tạp thời gian của đoạn mã trên luôn là O(n^2) trong mọi trường hợp do có hai vòng lặp lồng nhau.",
-          "Nếu truyền mảng A = [5, 2, 8, 1] và n = 4, sau khi kết thúc vòng lặp ngoài lần ĐẦU TIÊN (i = 0), phần tử 8 được đẩy về cuối mảng."
+          "Độ phức tạp thời gian của thuật toán này luôn là O(n^2) trong mọi trường hợp do có hai vòng lặp lồng nhau.",
+          "Nếu truyền mảng đầu vào A = [5, 2, 8, 1] và n = 4, sau khi kết thúc vòng lặp ngoài (biến i) lần ĐẦU TIÊN (i = 0), phần tử lớn nhất là 8 sẽ được đẩy về cuối mảng."
         ],
         answers: [false, true, true, true],
-        explanation: `ĐÁP ÁN CHI TIẾT CÂU 1:\na) Sai. Đây là thuật toán Sắp xếp nổi bọt (Bubble Sort).\nb) Đúng. Thuật toán so sánh từng cặp kề nhau A[j] và A[j+1] để đổi chỗ.\nc) Đúng. 2 vòng lặp lồng nhau chạy cố định n*(n-1)/2 lần.\nd) Đúng. Sau lượt i = 0, mảng trở thành [2, 5, 1, 8], số 8 được đẩy về cuối.`
-      },
-      {
-        day: 2,
-        type: "theory",
-        title: "Để xây dựng phần mềm quản lý thư viện, nhóm học sinh chia nhỏ chương trình thành 3 hàm: NhapThongTinSach(), TimKiemSach(), và InDanhSach().",
-        statements: [
-          "Việc chia chương trình thành 3 hàm là ví dụ minh hoạ cho phương pháp thiết kế chương trình theo mô đun.",
-          "Hàm TimKiemSach() có thể được lập trình và kiểm thử độc lập mà không cần chờ hàm InDanhSach() viết xong.",
-          "Khi kiểm thử, nhóm chỉ cần nhập đúng một bộ dữ liệu là 1 quyển sách chuẩn là đủ để đánh giá chương trình không lỗi.",
-          "Tổ chức chương trình thành các mô đun giúp dễ dàng phân công công việc và bảo trì mã nguồn sau này."
-        ],
-        answers: [true, true, false, true],
-        explanation: `ĐÁP ÁN CHI TIẾT CÂU 2:\na) Đúng. Chia nhỏ chương trình thành các hàm độc lập là bản chất của thiết kế mô đun.\nb) Đúng. Các mô đun độc lập cho phép lập trình và test riêng lẻ.\nc) Sai. Cần test nhiều bộ dữ liệu: biên, dữ liệu rỗng, dữ liệu sai...\nd) Đúng. Đây là ưu điểm chính giúp phân công công việc.`
-      }
+        explanation: `PHÂN TÍCH CHUNG:
++ Hàm sort_algo có hai tham số: 1. A: danh sách A. 2. n: số lượng phần tử của danh sách A.
++ Bên trong bao gồm 2 vòng for lồng nhau → độ phức tạp O(n²).
++ Vòng for đầu tiên: Biến i nhận các giá trị từ 0 đến n-2.
++ Vòng for thứ hai nằm phía bên trong: Biến j nhận các giá trị từ 0 đến n-i-2.
++ Câu lệnh if bên trong vòng for thứ hai:
+  - Điều kiện kiểm tra: A[j] > A[j+1].
+  - Nếu thỏa mãn điều kiện thì thực hiện câu lệnh A[j], A[j+1] = A[j+1], A[j]. Câu lệnh này sẽ thực hiện hoán đổi giá trị của A[j] và A[j+1] cho nhau.
+
+VÍ DỤ MINH HỌA:
+Lấy ví dụ với mảng vào A = [5, 2, 8, 1] và n = 4.
++ Vòng for ngoài, biến i nhận giá trị từ 0 đến 2 (do n-1=4-1=3, range(3)=0,1,2).
+- Vòng for ngoài lặp lần 1, với biến i=0:
+  Khi i=0 thì n-i-1=4-0-1=3, range(3)=0,1,2. Do đó vòng for trong, biến j nhận giá trị từ 0 đến 2.
+
+  + Vòng for trong lặp lần 1, với biến j=0:
+    * Khi đó A[j]=A[0]=5, A[j+1]=A[1]=2.
+    * So sánh: A[j] > A[j+1], thỏa mãn điều kiện của câu lệnh if.
+    * Hoán đổi A[j] và A[j+1], khi đó A[j]=2, A[j+1]=5.
+    * Mảng A=[2,5,8,1].
+
+  + Vòng for trong lặp lần 2, với biến j=1:
+    * Khi đó A[j]=A[1]=5, A[j+1]=A[2]=8.
+    * So sánh: A[j] < A[j+1], không thỏa mãn điều kiện của câu lệnh if.
+    * Không thực hiện hoán đổi.
+    * Mảng A=[2,5,8,1].
+
+  + Vòng for trong lặp lần 3, với biến j=2:
+    * Khi đó A[j]=A[2]=8, A[j+1]=A[3]=1.
+    * So sánh: A[j] > A[j+1], thỏa mãn điều kiện của câu lệnh if.
+    * Hoán đổi A[j] và A[j+1], khi đó A[j]=1, A[j+1]=8.
+    * Mảng A=[2,5,1,8].
+
+Nhận xét: Sau khi kết thúc lặp lần 1 của vòng for ngoài, PHẦN TỬ LỚN NHẤT CỦA MẢNG ĐÃ ĐƯỢC ĐẨY RA CUỐI CÙNG – VỊ TRÍ CÓ CHỈ SỐ LÀ N-1. Việc này có thể hiểu là phần tử lớn nhất “đã nổi lên” → Đây chính là Thuật toán Sắp xếp nổi bọt (Bubble Sort).
+
+Thực hiện tương tự với các lần lặp còn lại, lần lượt “làm nổi lên” các phần tử lớn thứ 2 lên vị trí chỉ số n-2, phần tử lớn thứ 3 lên vị trí chỉ số n-3. Phần tử cuối cùng sẽ luôn nằm đúng vị trí vì hiển nhiên các phần tử trước đã đúng vị trí.
+
+PHÂN TÍCH PHÁT BIỂU:
+a) Sai (Bubble Sort – Sắp xếp nổi bọt).
+b) Đúng.
+c) Đúng.
+d) Đúng.`
+      }, 
     ];
 
     function App() {
@@ -66,10 +94,17 @@
         return userAnswers.reduce((score, ans, idx) => score + (ans === question.answers[idx] ? 1 : 0), 0);
       };
 
-      const handleNextDay = () => {
-        setIsSubmitted(false);
-        setUserAnswers([null, null, null, null]);
-        if (currentDay < QUESTIONS.length) setCurrentDay(currentDay + 1);
+const handleNextDay = () => {
+        const nextDay = currentDay + 1;
+        const hasNextQuestion = QUESTIONS.some((q) => q.day === nextDay);
+
+        if (hasNextQuestion) {
+          setIsSubmitted(false);
+          setUserAnswers([null, null, null, null]);
+          setCurrentDay(nextDay);
+        } else {
+          alert(`⚠️ Chưa có dữ liệu cho Ngày ${nextDay}! Bạn đã hoàn thành hết các bài hiện có.`);
+        }
       };
 
       const labels = ["a", "b", "c", "d"];
